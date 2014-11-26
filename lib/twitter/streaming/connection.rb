@@ -5,7 +5,7 @@ require 'resolv'
 module Twitter
   module Streaming
     class Connection
-      attr_reader :tcp_socket_class, :ssl_socket_class
+      attr_reader :tcp_socket_class, :ssl_socket_class, :state
 
       def initialize(options = {})
         @tcp_socket_class = options.fetch(:tcp_socket_class) { TCPSocket }
@@ -13,6 +13,7 @@ module Twitter
         @using_ssl        = options.fetch(:using_ssl)        { false }
       end
 
+      # Initiate a socket connection and setup response handling
       def stream(request, response)
         client = connect(request)
         request.stream(client)
@@ -34,6 +35,29 @@ module Twitter
 
       def new_tcp_socket(host, port)
         @tcp_socket_class.new(Resolv.getaddress(host), port)
+      end
+
+      # Close the connection when it's in a closeable state
+      def close
+        return unless closeable?
+
+        @state = :closing
+        @ssl_client.close
+        @state = :closed
+      end
+
+    private
+
+      def connected?
+        @state == :connected
+      end
+
+      def connecting?
+        @state == :connecting
+      end
+
+      def closeable?
+        connected? || connecting?
       end
     end
   end
