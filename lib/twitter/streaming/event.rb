@@ -8,7 +8,7 @@ module Twitter
       ].freeze
 
       TWEET_EVENTS = [
-        :favorite, :unfavorite, :quoted_tweet
+        :favorite, :unfavorite, :quoted_tweet, :retweeted_retweet
       ].freeze
 
       attr_reader :name, :source, :target, :target_object
