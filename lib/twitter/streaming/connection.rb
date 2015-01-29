@@ -41,9 +41,9 @@ module Twitter
       def close
         return unless closeable?
 
-        @state = :closing
-        @ssl_client.close
-        @state = :closed
+        transition(:closing, :closed) do
+          @ssl_client.close
+        end
       end
 
     private
@@ -58,6 +58,12 @@ module Twitter
 
       def closeable?
         connected? || connecting?
+      end
+
+      def transition(from, to)
+        @state = from
+        yield
+        @state = to
       end
     end
   end
