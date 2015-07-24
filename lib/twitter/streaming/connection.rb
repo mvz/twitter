@@ -23,6 +23,7 @@ module Twitter
       end
 
       def connect(request)
+        port           = request.socket_port || Addressable::URI::PORT_MAPPING[request.uri.scheme]
         client = new_tcp_socket(request.socket_host, request.socket_port)
         return client if !@using_ssl && request.using_proxy?
 
