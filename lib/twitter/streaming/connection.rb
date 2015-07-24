@@ -66,6 +66,10 @@ module Twitter
         yield
         @state = to
       end
+
+      def request_port(request)
+        request.uri.port || Addressable::URI::PORT_MAPPING[request.uri.scheme]
+      end
     end
   end
 end
